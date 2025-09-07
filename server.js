@@ -17,60 +17,62 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const DbConnectionURL = `mongodb+srv://${process.env.DbUser}:${process.env.DbPass}@${process.env.DbURL}`
-const client = new mongodb.MongoClient( DbConnectionURL )
+const client = new mongodb.MongoClient(DbConnectionURL)
 const app = express()
 app.use(express.urlencoded({ extended: false })); //url parser
 app.use(express.json()) // parse data as json
 const port = 3000
-const Dbname ="SongWebsite"
+const Dbname = "SongWebsite"
+
 //Github Authentication
 passport.use(new passportGithub2.Strategy({
-        clientID: process.env.gitHubClient,
-        clientSecret: process.env.gitHubSecret,
-        callbackURL: "http://localhost:3000/api/users/auth/github/callback"
-    },
+    clientID: process.env.gitHubClient,
+    clientSecret: process.env.gitHubSecret,
+    callbackURL: "http://localhost:3000/api/users/auth/github/callback"
+},
     async function (accessToken, refreshToken, profile, done) {
         await client.connect()
         let usersTable = await client.db(Dbname).collection("Users")
 
         //attempt to find the user, if no user is present create one
-        let findResult = await usersTable.findOneAndUpdate({gitHubID:profile.id},
-            { $setOnInsert:{
-                    gitHubID:profile.id,
-                    userName:profile.username,
-                    favorites:[],
-                    }
-            }, {upsert:true})
+        let findResult = await usersTable.findOneAndUpdate({ gitHubID: profile.id },
+            {
+                $setOnInsert: {
+                    gitHubID: profile.id,
+                    userName: profile.username,
+                    favorites: [],
+                }
+            }, { upsert: true })
 
         return done(null, findResult)
     }
 ));
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
     done(null, user.gitHubID);
 });
 
 passport.deserializeUser(async function (gitHubID, done) {
     await client.connect()
     let usersTable = await client.db(Dbname).collection("Users")
-    let findUser = await usersTable.findOne({gitHubID:gitHubID})
+    let findUser = await usersTable.findOne({ gitHubID: gitHubID })
     done(null, findUser);
 });
 
-app.use(expressSession({ secret:process.env.sessionSecret, resave: false, saveUninitialized: false, store:MongoStore.create({mongoUrl:DbConnectionURL}) }))
+app.use(expressSession({ secret: process.env.sessionSecret, resave: false, saveUninitialized: false, store: MongoStore.create({ mongoUrl: DbConnectionURL }) }))
 app.use(passport.initialize())
 app.use(passport.session({}));
 
 export function isAuthed(req, res, next) {
     //console.log(req)
     if (req.isAuthenticated()) { return next(); }
-    else{
+    else {
         res.redirect("/login.html")
     }
 }
 
 app.get('/', isAuthed, (req, res) => {
-    res.sendFile('/public/index.html', {root: __dirname})
+    res.sendFile('/public/index.html', { root: __dirname })
 })
 
 // defining routes

@@ -1,12 +1,12 @@
-import mongodb, {ObjectId} from "mongodb";
+import mongodb, { ObjectId } from "mongodb";
 
 const DbConnectionURL = `mongodb+srv://${process.env.DbUser}:${process.env.DbPass}@${process.env.DbURL}`
-const client = new mongodb.MongoClient( DbConnectionURL )
+const client = new mongodb.MongoClient(DbConnectionURL)
 
-const Dbname ="SongWebsite"
+const Dbname = "SongWebsite"
 
 
-export async function createPlaylist(req,res) {
+export async function createPlaylist(req, res) {
     let newPlaylist = req.body
     //console.log("newPost")
     //console.log(newPost)
@@ -53,7 +53,7 @@ export async function deletePlaylist(req, res) {
     }
 }
 
-export async function updatePlaylistName(req,res) {
+export async function updatePlaylistName(req, res) {
     let idToUpdate = req.params.id
     let newName = req.body
     //console.log(idToUpdate)
@@ -84,7 +84,7 @@ export async function updatePlaylistName(req,res) {
 }
 
 
-export async function addSongToPlaylist(req,res) {
+export async function addSongToPlaylist(req, res) {
     let userID = req.user._id.toString()
     let playlistID = req.params.id
     let songToAdd = req.body.songID
@@ -95,7 +95,7 @@ export async function addSongToPlaylist(req,res) {
     try {
 
         let playlistTable = await client.db(Dbname).collection("Playlists")
-        let playlist = await playlistTable.findOne({_id: new ObjectId(playlistID),createdBy: userID})
+        let playlist = await playlistTable.findOne({ _id: new ObjectId(playlistID), createdBy: userID })
         let playlistSongs = playlist.songs
         playlistSongs.push(songToAdd)
 
@@ -105,7 +105,7 @@ export async function addSongToPlaylist(req,res) {
             }
         }
 
-        let playListUpdate = await playlistTable.findOneAndUpdate({_id: new ObjectId(playlistID),createdBy: userID}, updateStrat)
+        let playListUpdate = await playlistTable.findOneAndUpdate({ _id: new ObjectId(playlistID), createdBy: userID }, updateStrat)
 
 
         res.status(200)
@@ -117,7 +117,7 @@ export async function addSongToPlaylist(req,res) {
     }
 }
 
-export async function deleteSongFromPlaylist(req,res) {
+export async function deleteSongFromPlaylist(req, res) {
     let userID = req.user._id.toString()
     let playlistID = req.params.id
     let songToDelete = req.body.songID
@@ -128,13 +128,13 @@ export async function deleteSongFromPlaylist(req,res) {
     try {
 
         let playlistTable = await client.db(Dbname).collection("Playlists")
-        let playlist = await playlistTable.findOne({_id: new ObjectId(playlistID),createdBy: userID})
+        let playlist = await playlistTable.findOne({ _id: new ObjectId(playlistID), createdBy: userID })
         let playlistSongs = playlist.songs
         let indexToRemove = playlistSongs.indexOf(songToDelete)
-        if(indexToRemove !== -1) {
+        if (indexToRemove !== -1) {
             playlistSongs.splice(indexToRemove, 1)
         }
-        else{
+        else {
             res.status(400)
             res.send('song not found in db')
             return
@@ -146,7 +146,7 @@ export async function deleteSongFromPlaylist(req,res) {
             }
         }
 
-        let playListUpdate = await playlistTable.findOneAndUpdate({_id: new ObjectId(playlistID),createdBy: userID}, updateStrat)
+        let playListUpdate = await playlistTable.findOneAndUpdate({ _id: new ObjectId(playlistID), createdBy: userID }, updateStrat)
 
 
         res.status(200)
@@ -158,21 +158,21 @@ export async function deleteSongFromPlaylist(req,res) {
     }
 }
 
-export async function getSongsInPlaylist(req,res) {
+export async function getSongsInPlaylist(req, res) {
     let playlistID = req.params.id
     console.log(playlistID)
     try {
         let playlistTable = await client.db(Dbname).collection("Playlists")
-        let playlist = await playlistTable.findOne({_id: new ObjectId(playlistID)})
+        let playlist = await playlistTable.findOne({ _id: new ObjectId(playlistID) })
 
         let songs_IDs = playlist.songs
         let playlistSongs = []
         let songTable = await client.db(Dbname).collection("Songs")
 
         console.log(songs_IDs)
-        for(let i=0; i<songs_IDs.length;i++){
+        for (let i = 0; i < songs_IDs.length; i++) {
             console.log(new ObjectId(songs_IDs[i]))
-            playlistSongs.push(await songTable.findOne({_id:new ObjectId(songs_IDs[i])}))
+            playlistSongs.push(await songTable.findOne({ _id: new ObjectId(songs_IDs[i]) }))
         }
 
 
@@ -185,13 +185,13 @@ export async function getSongsInPlaylist(req,res) {
     }
 }
 
-export async function searchPlaylists(req,res) {
+export async function searchPlaylists(req, res) {
     let searchParms = req.body
     // console.log("searchParms")
     // console.log(searchParms)
 
     if (searchParms.name !== undefined) {
-        searchParms.name = {$regex: searchParms.name, $options: 'i'}
+        searchParms.name = { $regex: searchParms.name, $options: 'i' }
     }
 
     if (searchParms._id !== undefined) {
@@ -204,7 +204,7 @@ export async function searchPlaylists(req,res) {
 
     for (const [key, value] of Object.entries(searchParms)) {
         console.log(`${key}: ${value}`);
-        finalSearch.$or.push({[key]: value})
+        finalSearch.$or.push({ [key]: value })
     }
 
     if (Object.entries(searchParms).length === 0) {
@@ -229,19 +229,19 @@ export async function searchPlaylists(req,res) {
     }
 }
 
-export async function moveSong(req,res){
+export async function moveSong(req, res) {
     let parms = req.body
     console.log("parms stryder")
     console.log(parms)
     try {
         let playlistTable = await client.db(Dbname).collection("Playlists")
-        let playlist = await playlistTable.findOne({_id: new ObjectId(parms.playlist)})
+        let playlist = await playlistTable.findOne({ _id: new ObjectId(parms.playlist) })
 
         let songs_IDs = playlist.songs
         let indexToMove = songs_IDs.indexOf(parms.song)
-        let indexToMoveTo=parms.movement+indexToMove
+        let indexToMoveTo = parms.movement + indexToMove
 
-        if(indexToMoveTo<0 || indexToMoveTo>= songs_IDs.length){
+        if (indexToMoveTo < 0 || indexToMoveTo >= songs_IDs.length) {
             res.status(400)
             res.send('movement out of range')
             return
@@ -275,11 +275,11 @@ export async function moveSong(req,res){
     }
 }
 
-function newPlaylistIsVaild(newPlaylist){
-    if(newPlaylist.name === undefined || typeof(newPlaylist.name) !== "string"){
+function newPlaylistIsVaild(newPlaylist) {
+    if (newPlaylist.name === undefined || typeof (newPlaylist.name) !== "string") {
         return false
     }
-    if(newPlaylist.songs === undefined || !Array.isArray(newPlaylist.songs) ){
+    if (newPlaylist.songs === undefined || !Array.isArray(newPlaylist.songs)) {
         return false
     }
     return true
