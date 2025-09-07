@@ -1,42 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <script src="js/addPost.js" type="module"></script>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/addPost.css">
-    <title>Title</title>
-</head>
-<body>
-<nav class="navbar"></nav>
 
-<div class="formDiv">
-    <h1 class="addPostPageTitle">Add Post</h1>
-    <form class="addPostForm">
-        <label for="title" class="LabelMarginTop">Title</label><input id="title">
-        <label for="content" class="LabelMarginTop">Content</label><textarea id="content" class="contentArea"></textarea>
-        <div class="typeOfPostDiv">
-            <input id="isSong" type="radio" name="TypeOfPost" value="song"><label for="isSong">Song</label>
-            <input class="radioMarginLeft" id="isPlaylist" type="radio" name="TypeOfPost" value="playlist"><label for="isPlaylist">Playlist</label>
+    <head>
+        <meta charset="UTF-8">
+        <script src="js/addPost.js" type="module"></script>
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/addPost.css">
+        <title>Title</title>
+    </head>
+
+    <body>
+        <nav class="navbar"></nav>
+
+        <div class="formDiv">
+            <h1 class="addPostPageTitle">Add Post</h1>
+            <form class="addPostForm">
+                <label for="title" class="LabelMarginTop">Title</label><input id="title">
+                <label for="content" class="LabelMarginTop">Content</label><textarea id="content"
+                    class="contentArea"></textarea>
+                <div class="typeOfPostDiv">
+                    <input id="isSong" type="radio" name="TypeOfPost" value="song"><label for="isSong">Song</label>
+                    <input class="radioMarginLeft" id="isPlaylist" type="radio" name="TypeOfPost"
+                        value="playlist"><label for="isPlaylist">Playlist</label>
+                </div>
+
+                <div id="divForSearch" class="dropDownContainer">
+                    <button id="searchButton" class="searchButton-hidden"></button>
+                    <div id="postTopicDropDown" class="postTopicDropDown-hidden">
+                        <input type="text" placeholder="Search.." id="postTopicSearch" class="topicSearch" value="">
+
+                    </div>
+                </div>
+                <label id="topicLabel" class="topic-hidden">Topic</label>
+                <p id="topicP" class="topic-hidden"></p>
+                <input id="idOfTopic" style="display: none">
+                <button id="submitNewPost" class="topic-hidden">Add Post</button>
+            </form>
         </div>
 
-        <div id="divForSearch" class="dropDownContainer">
-            <button id="searchButton" class="searchButton-hidden"></button>
-            <div id="postTopicDropDown" class="postTopicDropDown-hidden" >
-                <input type="text" placeholder="Search.." id="postTopicSearch" class="topicSearch" value="">
-
-            </div>
-        </div>
-        <label id="topicLabel" class="topic-hidden">Topic</label>
-        <p id="topicP" class="topic-hidden"></p>
-        <input id="idOfTopic" style="display: none">
-        <button id="submitNewPost" class="topic-hidden">Add Post</button>
-    </form>
-</div>
 
 
 
 
+    </body>
 
-</body>
 </html>
